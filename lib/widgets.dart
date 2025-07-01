@@ -123,10 +123,10 @@ class InitiativeZone extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.arrow_forward),
+                      // Icon(Icons.arrow_forward),
                       Text(item.name),
                       SizedBox(width: 10),
-                      InputWidget(label: "", controller: charHeath),
+                      // InputWidget(label: "", controller: charHeath),
                     ],
                   ),
                 ],

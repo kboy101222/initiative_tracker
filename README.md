@@ -1,16 +1,13 @@
-# initiative_tracker
+# Initiative Tracker
 
-A new Flutter project.
+A (soon to be) feature rich yet simple initiative tracker for TTRPGs, specifically Pathfinder and Dungeons & Dragons (or any system that uses that style of initiative)
 
-## Getting Started
+The program is written in Dart and intended for PCs. Currently it's only for Linux, but a Windows version is planned for when I can bother to spin up a VM.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## To Do:
+* Health tracker
+* Notes
+* Status effects
+* Dark Mode
+* Windows Version
+* Turn tracking
