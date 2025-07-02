@@ -10,6 +10,6 @@ The program is written in Dart and intended for PCs. Currently it's only for Lin
 * Status effects
 * Dark Mode
 * Windows Version
-* Turn tracking
+* ~~Turn tracking~~
 * Automated testing
 * Add groups of monsters together
