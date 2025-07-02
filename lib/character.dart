@@ -1,13 +1,17 @@
+import 'dart:math';
+
 import 'errors.dart';
 
 class Character {
   Character({
     required this.name,
     required this.initiative,
+    required this.id,
     this.maxHp,
     this.currHp,
     this.notes,
-  });
+    String? displayName,
+  }) : _displayName = displayName;
 
   String name;
   int initiative;
@@ -15,6 +19,9 @@ class Character {
   int? currHp;
   String? notes;
   List<String> statuses = [];
+  bool isTurn = false;
+  int id;
+  String? _displayName;
 
   set setName(String newName) {
     name = newName;
@@ -22,6 +29,24 @@ class Character {
 
   String get getName {
     return name;
+  }
+
+  set displayName(String newName) {
+    _displayName = newName;
+  }
+
+  String get displayName {
+    String _displayName;
+    if (this._displayName == null) {
+      _displayName = "";
+    } else {
+      _displayName = this._displayName!;
+    }
+    return _displayName;
+  }
+
+  void generateNewId() {
+    id = Random().nextInt(double.maxFinite.toInt());
   }
 
   void changeHp(int amount) {
@@ -55,30 +80,57 @@ class CharacterList extends Iterable<Character> {
 
   List<Character> list = [];
 
-  bool checkUnique(String charName) {
-    for (Character item in list) {
-      if (item.name == charName) {
-        return false;
-      }
+  bool checkUnique(int characterId) {
+    if (findFirstCharacter(characterId: characterId) == -1) {
+      return true;
     }
-    return true;
+    return false;
   }
 
-  int findCharacter(Character charToFind) {
+  int findFirstCharacter({
+    Character? characterClass,
+    int? characterId,
+    String? characterName,
+  }) {
     int charIndex = -1;
 
-    for (int i = 0; i < list.length; i++) {
-      if (list[i] == charToFind) {
-        charIndex = i;
-        break;
+    if (characterClass != null) {
+      for (int i = 0; i < list.length; i++) {
+        if (list[i] == characterClass) {
+          if (characterId != null && list[i].id == characterId) {
+            charIndex = i;
+            break;
+          } else if (characterId != null) {
+            continue;
+          }
+          charIndex = i;
+          break;
+        }
+      }
+    } else if (characterId != null) {
+      for (int i = 0; i < list.length; i++) {
+        if (list[i].id == characterId) {
+          charIndex = i;
+          break;
+        }
       }
     }
 
     return charIndex;
   }
 
+  List<int> findAllCharacters(String characterName) {
+    List<int> foundItems = [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].name == characterName) {
+        foundItems.add(i);
+      }
+    }
+    return foundItems;
+  }
+
   bool setInitiative(Character charToChange, int newInitiative) {
-    int charIndex = findCharacter(charToChange);
+    int charIndex = findFirstCharacter(characterClass: charToChange);
     if (charIndex != -1) {
       list[charIndex].initiative = newInitiative;
       sort();
@@ -92,12 +144,14 @@ class CharacterList extends Iterable<Character> {
     list.sort((a, b) => b.initiative - a.initiative);
   }
 
-  void add(Character newChar) {
-    if (newChar.name == "") {
+  void add(Character newCharacter) {
+    if (newCharacter.name == "") {
       throw EmptyNameFieldException();
     }
-    if (!checkUnique(newChar.name)) {}
-    list.add(newChar);
+    while (!checkUnique(newCharacter.id)) {
+      newCharacter.generateNewId();
+    }
+    list.add(newCharacter);
     sort();
   }
 
@@ -121,4 +175,6 @@ class CharacterList extends Iterable<Character> {
 
   @override
   Iterator<Character> get iterator => list.iterator;
+
+  Character operator [](int index) => list[index];
 }

@@ -69,191 +69,217 @@ class InitiativeZone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<InitiativeAppState>();
-    final TextEditingController charHeath = TextEditingController();
+    // final TextEditingController charHeath = TextEditingController();
 
     // Text Controllers for changing name and initiative
     final TextEditingController newInitiative = TextEditingController();
     final TextEditingController newName = TextEditingController();
 
-    final FocusNode _menuFocusNode = FocusNode(debugLabel: 'Menu Button');
+    final FocusNode menuFocusNode = FocusNode(debugLabel: 'Menu Button');
 
     if (appState.characters.isEmpty) {
-      return Center(child: Text("Add characters to initiative!"));
+      return Expanded(
+        child: Center(child: Text("Add characters to initiative!")),
+      );
     }
 
-    return Expanded(
-      child: ListView(
-        children: [
-          Padding(padding: const EdgeInsets.all(20)),
-          for (Character item in appState.characters)
-            ListTile(
-              // Click on the initiative to change its value
-              leading: TextButton(
-                onPressed: () => showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: const Text("Changing Initiative"),
-                    content: InputWidget(
-                      label: "New Initiative",
-                      controller: newInitiative,
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, 'Cancel'),
-                        child: Text("Cancel"),
-                      ),
-                      TextButton(
-                        onPressed: () => {
-                          appState.setInitiative(
-                            item,
-                            int.parse(newInitiative.text),
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            children: [
+              Padding(padding: const EdgeInsets.all(20)),
+              for (Character item in appState.characters)
+                ListTile(
+                  // Click on the initiative to change its value
+                  leading: TextButton(
+                    onPressed: () => {
+                      newInitiative.text = item.initiative.toString(),
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          title: const Text("Changing Initiative"),
+                          content: InputWidget(
+                            label: "New Initiative",
+                            controller: newInitiative,
                           ),
-                          newInitiative.clear(),
-                          Navigator.pop(context, "Ok"),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => {
+                                appState.setCharacterInitiative(
+                                  item,
+                                  int.parse(newInitiative.text),
+                                ),
+                                newInitiative.clear(),
+                                Navigator.pop(context, "Ok"),
+                              },
+                              child: Text("Ok"),
+                            ),
+                          ],
+                        ),
+                      ),
+                    },
+                    child: Text(item.initiative.toString()),
+                  ),
+                  title: OverflowBar(
+                    spacing: 8,
+                    children: [
+                      Row(
+                        children: [
+                          (item.displayName == "")
+                              ? Text(item.name)
+                              : Text(item.displayName),
+                          SizedBox(width: 10),
+                          Visibility(
+                            // Only show the arrow on turn
+                            visible: item.isTurn,
+                            child: Icon(Icons.arrow_back),
+                          ),
+                          // InputWidget(label: "", controller: charHeath),
+                        ],
+                      ),
+                    ],
+                  ),
+                  trailing: OverflowBar(
+                    // End Options
+                    spacing: 8,
+                    children: [
+                      OutlinedButton(
+                        // Add Note
+                        onPressed: () {
+                          print("Adding a note to ${item.name}");
+                          // TODO: Implement notes
                         },
-                        child: Text("Ok"),
+                        child: Icon(Icons.assignment_add),
+                      ),
+                      OutlinedButton(
+                        // Delete Character
+                        onPressed: () {
+                          appState.removeCharacter(item);
+                        },
+                        child: Icon(Icons.delete),
+                      ),
+                      MenuAnchor(
+                        // Character Options
+                        childFocusNode: menuFocusNode,
+                        menuChildren: <Widget>[
+                          MenuItemButton(
+                            child: Row(
+                              children: [
+                                Icon(EditCharacterMenuEntry.editName.icon),
+                                Text(EditCharacterMenuEntry.editName.label),
+                              ],
+                            ),
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: const Text("Change Name"),
+                                content: InputWidget(
+                                  label: "New Name",
+                                  controller: newName,
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'Cancel'),
+                                    child: Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => {
+                                      appState.setCharacterName(
+                                        item,
+                                        newName.text,
+                                      ),
+                                      newName.clear(),
+                                      Navigator.pop(context, "Ok"),
+                                    },
+                                    child: Text("Ok"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          MenuItemButton(
+                            child: Row(
+                              children: [
+                                SettingMenuItem(
+                                  entry: EditCharacterMenuEntry.editInitiative,
+                                ),
+                              ],
+                            ),
+                            onPressed: () => {
+                              // Change Initiative
+                              newInitiative.text = item.initiative.toString(),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text("Changing Initiative"),
+                                  content: InputWidget(
+                                    label: "New Initiative",
+                                    controller: newInitiative,
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, 'Cancel'),
+                                      child: Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => {
+                                        appState.setCharacterInitiative(
+                                          item,
+                                          int.parse(newInitiative.text),
+                                        ),
+                                        newInitiative.clear(),
+                                        Navigator.pop(context, "Ok"),
+                                      },
+                                      child: Text("Ok"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            },
+                          ),
+                          Divider(),
+                          MenuItemButton(
+                            child: Row(
+                              children: [
+                                SettingMenuItem(
+                                  entry: EditCharacterMenuEntry.setAsCurrTurn,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        builder: // edit character menu
+                            (
+                              BuildContext context,
+                              MenuController controller,
+                              Widget? child,
+                            ) {
+                              return OutlinedButton(
+                                onPressed: () {
+                                  if (controller.isOpen) {
+                                    controller.close();
+                                  } else {
+                                    controller.open();
+                                  }
+                                },
+                                child: Icon(Icons.build),
+                              );
+                            },
                       ),
                     ],
                   ),
                 ),
-                child: Text(item.initiative.toString()),
-              ),
-              title: OverflowBar(
-                spacing: 8,
-                children: [
-                  Row(
-                    children: [
-                      // Icon(Icons.arrow_forward),
-                      Text(item.name),
-                      SizedBox(width: 10),
-                      // InputWidget(label: "", controller: charHeath),
-                    ],
-                  ),
-                ],
-              ),
-              trailing: OverflowBar(
-                spacing: 8,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      print("Adding a note to ${item.name}");
-                      // TODO: Implement notes
-                    },
-                    child: Icon(Icons.assignment_add),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      appState.removeCharacter(item);
-                    },
-                    child: Icon(Icons.delete),
-                  ),
-                  MenuAnchor(
-                    childFocusNode: _menuFocusNode,
-                    menuChildren: <Widget>[
-                      MenuItemButton(
-                        child: Row(
-                          children: [
-                            Icon(EditCharacterMenuEntry.editName.icon),
-                            Text(EditCharacterMenuEntry.editName.label),
-                          ],
-                        ),
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text("Change Name"),
-                            content: InputWidget(
-                              label: "New Name",
-                              controller: newName,
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Cancel'),
-                                child: Text("Cancel"),
-                              ),
-                              TextButton(
-                                onPressed: () => {
-                                  appState.setDisplayName(item, newName.text),
-                                  newName.clear(),
-                                  Navigator.pop(context, "Ok"),
-                                },
-                                child: Text("Ok"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      MenuItemButton(
-                        child: Row(
-                          children: [
-                            SettingMenuItem(
-                              entry: EditCharacterMenuEntry.editInitiative,
-                            ),
-                          ],
-                        ),
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text("Changing Initiative"),
-                            content: InputWidget(
-                              label: "New Initiative",
-                              controller: newInitiative,
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Cancel'),
-                                child: Text("Cancel"),
-                              ),
-                              TextButton(
-                                onPressed: () => {
-                                  appState.setInitiative(
-                                    item,
-                                    int.parse(newInitiative.text),
-                                  ),
-                                  newInitiative.clear(),
-                                  Navigator.pop(context, "Ok"),
-                                },
-                                child: Text("Ok"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Divider(),
-                      MenuItemButton(
-                        child: Row(
-                          children: [
-                            SettingMenuItem(
-                              entry: EditCharacterMenuEntry.editName,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    builder: // edit character menu
-                        (
-                          BuildContext context,
-                          MenuController controller,
-                          Widget? child,
-                        ) {
-                          return OutlinedButton(
-                            onPressed: () {
-                              if (controller.isOpen) {
-                                controller.close();
-                              } else {
-                                controller.open();
-                              }
-                            },
-                            child: Icon(Icons.build),
-                          );
-                        },
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -269,6 +295,17 @@ class SettingMenuItem extends StatelessWidget {
   }
 }
 
+enum EditCharacterMenuEntry {
+  editName('Edit Name', Icons.edit),
+  editInitiative('Edit Initiative', Icons.edit),
+  setAsCurrTurn('Set as Current Turn', Icons.arrow_right);
+
+  const EditCharacterMenuEntry(this.label, this.icon);
+  final IconData icon;
+  final String label;
+}
+
+// Error popup alert
 AlertDialog errorAlert(String errorText, BuildContext context) {
   return AlertDialog(
     title: Text("Error!"),
@@ -282,12 +319,31 @@ AlertDialog errorAlert(String errorText, BuildContext context) {
   );
 }
 
-enum EditCharacterMenuEntry {
-  editName('Edit Name', Icons.edit),
-  editInitiative('Edit Initiative', Icons.edit),
-  setAsCurrTurn('Set as Current Turn', Icons.arrow_downward);
+class ActionBar extends StatelessWidget {
+  const ActionBar({super.key});
 
-  const EditCharacterMenuEntry(this.label, this.icon);
-  final IconData icon;
-  final String label;
+  @override
+  Widget build(BuildContext context) {
+    var appData = context.watch<InitiativeAppState>();
+    return BottomAppBar(
+      elevation: 10,
+      shape: const CircularNotchedRectangle(),
+      color: Theme.of(context).colorScheme.onPrimaryContainer,
+      child: IconTheme(
+        data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
+        child: Row(
+          children: <Widget>[
+            IconButton(
+              onPressed: () {
+                appData.toggleGreenscreen();
+                // Theme.of(context)
+              },
+              icon: Icon(Icons.videocam),
+              tooltip: "Toggle Green Screen (WIP)",
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

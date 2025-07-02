@@ -11,3 +11,5 @@ The program is written in Dart and intended for PCs. Currently it's only for Lin
 * Dark Mode
 * Windows Version
 * Turn tracking
+* Automated testing
+* Add groups of monsters together
