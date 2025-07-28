@@ -5,7 +5,7 @@ A (soon to be) feature rich yet simple initiative tracker for TTRPGs, specifical
 The program is written in Dart and intended for PCs. Currently it's only for Linux, but a Windows version is planned for when I can bother to spin up a VM.
 
 ## To Do:
-* Health tracker
+* ~~Health tracker~~
 * Notes
 * Status effects
 * Dark Mode
